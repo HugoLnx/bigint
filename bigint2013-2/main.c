@@ -26,13 +26,24 @@ void reportarTestes()
 
 int main() {
 	BigInt big;
-	unsigned int x;
+	unsigned int uint;
+	int vint;
 
 	// big_uval e cast_uint
-	big_uval(big, 10000);
-	x = big_cast_uint(big);
-	assert(10000, x);
-	
+	big_uval(big, 33);
+	uint = big_cast_uint(big);
+	assert(33, uint);
+
+	// big_val e cast_int
+	big_val(big, 33);
+	vint = big_cast_int(big);
+	assert(33, vint);
+
+	// big_val e cast_int com negativo
+	big_val(big, -33);
+	vint = big_cast_int(big);
+	assert(-33, vint);
+
 	reportarTestes();
 
 	return 0;
