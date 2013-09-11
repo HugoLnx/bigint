@@ -6,6 +6,30 @@ typedef unsigned char BigInt[NUM_BYTES];
 void zerarBytes(BigInt res);
 void zerarBytesCom(BigInt res, char byte);
 
+void big_sum (BigInt res, BigInt a, BigInt b)
+{
+	int i;
+	unsigned char * resBytes = (unsigned char *) res;
+	unsigned char * aBytes = (unsigned char *) a;
+	unsigned char * bBytes = (unsigned char *) b;
+	int soma;
+	char sobra = 0;
+
+	for(i = 0 ; i < NUM_BYTES ; i++)
+	{
+		soma = *aBytes++ + *bBytes++ + sobra;
+		if(soma > 0xff) {
+			sobra = 1;
+			soma -= 0xff + 1;
+		}
+		else
+		{
+			sobra = 0;
+		}
+		*resBytes++ = soma;
+	}
+}
+
 void big_val (BigInt res, int val)
 {
 	int * n = (int *) res;
