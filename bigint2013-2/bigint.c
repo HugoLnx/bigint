@@ -11,9 +11,8 @@ void big_val (BigInt res, int val)
 	int * n = (int *) res;
 	char bit_do_sinal;
 
-	zerarBytes(res);
-
 	bit_do_sinal = (val >> 31) * 0xff;
+
 	if ( bit_do_sinal == 0x01 )
 	{
 		zerarBytesCom(res, 0xff);
