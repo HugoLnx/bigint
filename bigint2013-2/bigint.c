@@ -35,7 +35,7 @@ void big_val (BigInt res, int val)
 	int * n = (int *) res;
 	char bit_do_sinal;
 
-	bit_do_sinal = (val >> 31) * 0xff;
+	bit_do_sinal = (val & 0x80000000) == 0x80000000;
 
 	if ( bit_do_sinal == 0x01 )
 	{
