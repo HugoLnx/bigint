@@ -7,6 +7,8 @@ typedef unsigned char BigInt[NUM_BYTES];
 void zerar_bytes(BigInt res);
 void zerar_bytes_com(BigInt res, char byte);
 unsigned char bit_pow(unsigned char n, unsigned char exp);
+unsigned char byte_shift_esquerda(unsigned char bits, unsigned char qnt_bits);
+unsigned char byte_shift_direita(unsigned char bits, unsigned char qnt_bits);
 
 void big_sum (BigInt res, BigInt a, BigInt b)
 {
@@ -81,8 +83,8 @@ void big_shl (BigInt res, BigInt a, int n)
 
 		for ( byte = 0 ; byte < NUM_BYTES - n / 8 ; byte++ )
 		{
-			*resBytes = *aBytes * bit_pow(2, qnt_bits) + bits_iniciais;
-			bits_iniciais = *aBytes / bit_pow(2, 8 - qnt_bits);
+			*resBytes = byte_shift_esquerda(*aBytes, qnt_bits) + bits_iniciais;
+			bits_iniciais = byte_shift_direita(*aBytes, 8 - qnt_bits);
 			resBytes++;
 			aBytes++;
 		}
@@ -105,8 +107,8 @@ void big_shr (BigInt res, BigInt a, int n)
 
 	for ( byte = 0 ; byte < NUM_BYTES - n / 8 ; byte++ )
 	{
-		*resBytes = *aBytes / bit_pow(2, qnt_bits) + bits_finais;
-		bits_finais = *aBytes * bit_pow(2, 8 - qnt_bits);
+		*resBytes = byte_shift_direita(*aBytes, qnt_bits) + bits_finais;
+		bits_finais = byte_shift_esquerda(*aBytes, 8 - qnt_bits);
 		resBytes--;
 		aBytes--;
 	}
@@ -168,4 +170,16 @@ void zerar_bytes(BigInt res)
 unsigned char bit_pow(unsigned char n, unsigned char exp)
 {
 	return (unsigned char) pow((double) n, (double) exp); 
+}
+
+
+unsigned char byte_shift_esquerda(unsigned char bits, unsigned char qnt_bits)
+{
+	 return bits * bit_pow(2, qnt_bits);
+}
+
+
+unsigned char byte_shift_direita(unsigned char bits, unsigned char qnt_bits)
+{
+	 return (qnt_bits == 0 ? bits : bits / bit_pow(2, qnt_bits));
 }
