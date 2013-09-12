@@ -96,10 +96,10 @@ void big_shr (BigInt res, BigInt a, int n)
 	unsigned char * resBytes = (unsigned char*) res;
 	unsigned char * aBytes = (unsigned char*) a;
 	unsigned char bits_finais = 0;
-	unsigned char qnt_bits, m, d;
+	unsigned char qnt_bits;
 
 	resBytes += NUM_BYTES - n / 8 - 1;
-	aBytes += NUM_BYTES - n / 8 - 1;
+	aBytes += NUM_BYTES - 1;
 
 	qnt_bits = n % 8;
 
