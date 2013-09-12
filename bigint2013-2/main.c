@@ -24,8 +24,8 @@ void assertBytes(void * esperado, void * obtido, int size)
 {
 	int i;
 	int erro = 0;
-	char * bytesObt = (char *) obtido;
-	char * bytesEsp = (char *) esperado;
+	unsigned char * bytesObt = (unsigned char *) obtido;
+	unsigned char * bytesEsp = (unsigned char *) esperado;
 
 	for ( i = 0 ; i < size ; i++ )
 	{
@@ -35,13 +35,13 @@ void assertBytes(void * esperado, void * obtido, int size)
 
 	if(erro)
 	{
-		bytesObt = (char *) obtido;
-		bytesEsp = esperado;
+		bytesObt = (unsigned char *) obtido;
+		bytesEsp = (unsigned char *) esperado;
 
 		assertsFalharam++;
 		
 		printf("[%s]: erro bytes errados:\nesperado > obtido\n", testName);
-		for ( i = 0 ; i < 16 ; i++ )
+		for ( i = 0 ; i < size ; i++ )
 		{
 			printf("%02x > %02x\n", *bytesEsp++, *bytesObt++);
 		}
@@ -214,6 +214,41 @@ int main() {
 		0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00
 	), big);
+
+	
+	test("uval: 256 - 1 = 0xff 0x00 (15x)");
+	big_uval(a, 256);
+	big_uval(b, 1);
+	big_sub(big, a, b);
+	assertBytesBI(bytesFrom(
+		0xff, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00
+	), big);
+
+	
+	test("val: 1 - 1 = 0x00 (16x)");
+	big_val(a, 1);
+	big_val(b, 1);
+	big_sub(big, a, b);
+	assertBytesBI(bytesFrom(
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00
+	), big);
+
+	test("0xa1a2a3a4 << 8 = 0x00 0xa4 0xa3 0xa2 0xa1 (11x) 0x00");
+	big_uval(a, 0xa1a2a3a4);
+	big_shl(big, a, 8);
+	assertBytesBI(bytesFrom(
+		0x00, 0xa4, 0xa3, 0xa2,
+		0xa1, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00
+	), big);
+
 
 	reportarTestes();
 

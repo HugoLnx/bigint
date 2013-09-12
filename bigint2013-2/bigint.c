@@ -44,13 +44,32 @@ void big_sub (BigInt res, BigInt a, BigInt b)
 		subt = *aBytes++ - *bBytes++ - sobra;
 		if(subt < 0) {
 			sobra = 1;
-			subt += 0xff;
+			subt += 0xff + 1;
 		}
 		else
 		{
 			sobra = 0;
 		}
 		*resBytes++ = subt;
+	}
+}
+
+
+void big_shl (BigInt res, BigInt a, int n)
+{
+	int byte;
+	unsigned char * resBytes = (unsigned char*) res;
+	unsigned char * aBytes = (unsigned char*) a;
+
+	resBytes += n / 8;
+	if ( n % 8 )
+	{
+		resBytes--;
+	}
+
+	for ( byte = 0 ; byte < NUM_BYTES - n / 8 ; byte++ )
+	{
+		*(resBytes++) = (*aBytes++);
 	}
 }
 
