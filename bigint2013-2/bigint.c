@@ -66,6 +66,8 @@ void big_shl (BigInt res, BigInt a, int n)
 
 	resBytes += n / 8;
 
+	zerar_bytes(res);
+
 	if(n % 8 == 0)
 	{
 		for ( byte = 0 ; byte < NUM_BYTES - n / 8 ; byte++ )
