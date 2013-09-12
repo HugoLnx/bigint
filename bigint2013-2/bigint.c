@@ -66,14 +66,24 @@ void big_shl (BigInt res, BigInt a, int n)
 
 	resBytes += n / 8;
 
-	qnt_bits = n % 8;
-
-	for ( byte = 0 ; byte < NUM_BYTES - n / 8 ; byte++ )
+	if(n % 8 == 0)
 	{
-		*resBytes = *aBytes * bit_pow(2, qnt_bits) + bits_iniciais;
-		bits_iniciais = *aBytes / bit_pow(2, 8 - qnt_bits);
-		resBytes++;
-		aBytes++;
+		for ( byte = 0 ; byte < NUM_BYTES - n / 8 ; byte++ )
+		{
+			*resBytes++ = *aBytes++;
+		}
+	}
+	else
+	{
+		qnt_bits = n % 8;
+
+		for ( byte = 0 ; byte < NUM_BYTES - n / 8 ; byte++ )
+		{
+			*resBytes = *aBytes * bit_pow(2, qnt_bits) + bits_iniciais;
+			bits_iniciais = *aBytes / bit_pow(2, 8 - qnt_bits);
+			resBytes++;
+			aBytes++;
+		}
 	}
 }
 
