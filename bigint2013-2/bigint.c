@@ -70,24 +70,14 @@ void big_shl (BigInt res, BigInt a, int n)
 
 	zerar_bytes(res);
 
-	if(n % 8 == 0)
-	{
-		for ( byte = 0 ; byte < NUM_BYTES - n / 8 ; byte++ )
-		{
-			*resBytes++ = *aBytes++;
-		}
-	}
-	else
-	{
-		qnt_bits = n % 8;
+	qnt_bits = n % 8;
 
-		for ( byte = 0 ; byte < NUM_BYTES - n / 8 ; byte++ )
-		{
-			*resBytes = byte_shift_esquerda(*aBytes, qnt_bits) + bits_iniciais;
-			bits_iniciais = byte_shift_direita(*aBytes, 8 - qnt_bits);
-			resBytes++;
-			aBytes++;
-		}
+	for ( byte = 0 ; byte < NUM_BYTES - n / 8 ; byte++ )
+	{
+		*resBytes = byte_shift_esquerda(*aBytes, qnt_bits) + bits_iniciais;
+		bits_iniciais = byte_shift_direita(*aBytes, 8 - qnt_bits);
+		resBytes++;
+		aBytes++;
 	}
 }
 
@@ -181,5 +171,6 @@ unsigned char byte_shift_esquerda(unsigned char bits, unsigned char qnt_bits)
 
 unsigned char byte_shift_direita(unsigned char bits, unsigned char qnt_bits)
 {
-	 return (qnt_bits == 0 ? bits : bits / bit_pow(2, qnt_bits));
+	unsigned char pow_result = bit_pow(2, qnt_bits);
+	return (pow_result == 0 ? 0 : bits / pow_result);
 }
