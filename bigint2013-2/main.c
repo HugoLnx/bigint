@@ -193,6 +193,18 @@ int main() {
 	), big);
 	
 	test("uval: 1 - 1 = 0x00 (16x)");
+	big_uval(a, 1);
+	big_uval(b, 1);
+	big_sub(big, a, b);
+	assertBytesBI(bytesFrom(
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00
+	), big);
+
+	
+	test("val: 1 - 1 = 0x00 (16x)");
 	big_val(a, 1);
 	big_val(b, 1);
 	big_sub(big, a, b);
