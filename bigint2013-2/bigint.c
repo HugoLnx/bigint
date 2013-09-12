@@ -77,6 +77,29 @@ void big_shl (BigInt res, BigInt a, int n)
 	}
 }
 
+
+void big_shr (BigInt res, BigInt a, int n)
+{
+	int byte;
+	unsigned char * resBytes = (unsigned char*) res;
+	unsigned char * aBytes = (unsigned char*) a;
+	unsigned char bits_finais = 0;
+	unsigned char qnt_bits, m, d;
+
+	resBytes += NUM_BYTES - n / 8 - 1;
+	aBytes += NUM_BYTES - n / 8 - 1;
+
+	qnt_bits = n % 8;
+
+	for ( byte = 0 ; byte < NUM_BYTES - n / 8 ; byte++ )
+	{
+		*resBytes = *aBytes / bit_pow(2, qnt_bits) + bits_finais;
+		bits_finais = *aBytes * bit_pow(2, 8 - qnt_bits);
+		resBytes--;
+		aBytes--;
+	}
+}
+
 void big_val (BigInt res, int val)
 {
 	int * n = (int *) res;
