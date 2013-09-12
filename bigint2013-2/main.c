@@ -20,14 +20,14 @@ void assert(unsigned int esperado, unsigned int obtido)
 	}
 }
 
-void assertBytes(char * esperado, void * obtido)
+void assertBytes(void * esperado, void * obtido, int size)
 {
 	int i;
 	int erro = 0;
 	char * bytesObt = (char *) obtido;
-	char * bytesEsp = esperado;
+	char * bytesEsp = (char *) esperado;
 
-	for ( i = 0 ; i < 16 ; i++ )
+	for ( i = 0 ; i < size ; i++ )
 	{
 		erro = (*bytesEsp++ != *bytesObt++);
 		if(erro) break;
@@ -49,6 +49,12 @@ void assertBytes(char * esperado, void * obtido)
 		assertsPassaram++;
 	}
 }
+
+void assertBytesBI(void * esperado, void * obtido)
+{
+	assertBytes(esperado, obtido, NUM_BYTES);
+}
+
 
 void test(char * name)
 {
@@ -98,7 +104,7 @@ int main() {
 
 	test("big_uval => 1 como: 0x00(15x) 0x01");
 	big_uval(big, 1);
-	assertBytes(bytesFrom(
+	assertBytesBI(bytesFrom(
 		0x01, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00,
@@ -107,7 +113,7 @@ int main() {
 	
 	test("big_val => 1 como: 0x00(15x) 0x01");
 	big_val(big, 1);
-	assertBytes(bytesFrom(
+	assertBytesBI(bytesFrom(
 		0x01, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00,
@@ -116,7 +122,7 @@ int main() {
 	
 	test("big_val => -1 como: 0xff(16x)");
 	big_val(big, -1);
-	assertBytes(bytesFrom(
+	assertBytesBI(bytesFrom(
 		0xff, 0xff, 0xff, 0xff,
 		0xff, 0xff, 0xff, 0xff,
 		0xff, 0xff, 0xff, 0xff,
@@ -127,7 +133,7 @@ int main() {
 	test("1 + 1 = 0x02 0x00(15x)");
 	big_val(a, 1);
 	big_sum(big, a, a);
-	assertBytes(bytesFrom(
+	assertBytesBI(bytesFrom(
 		0x02, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00,
@@ -139,23 +145,19 @@ int main() {
 	big_uval(a, 0xff);
 	big_uval(b, 0x01);
 	big_sum(big, a, b);
-	assertBytes(bytesFrom(
+	assertBytesBI(bytesFrom(
 		0x00, 0x01, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00
 	), big);
-
-	test("0xff + 1 = 0x00 0x01 0x00(14x)");
-	big_val(a, 0xff);
-	big_val(b, 0x01);
+	
+	test("uval: 0xff + 1 = 256");
+	big_uval(a, 0xff);
+	big_uval(b, 0x01);
 	big_sum(big, a, b);
-	assertBytes(bytesFrom(
-		0x00, 0x01, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00
-	), big);
+	vint = 256;
+	assertBytes(&vint, big, 4);
 	
 
 	reportarTestes();
