@@ -30,6 +30,30 @@ void big_sum (BigInt res, BigInt a, BigInt b)
 	}
 }
 
+void big_sub (BigInt res, BigInt a, BigInt b)
+{
+	int i;
+	unsigned char * resBytes = (unsigned char *) res;
+	unsigned char * aBytes = (unsigned char *) a;
+	unsigned char * bBytes = (unsigned char *) b;
+	int subt;
+	char sobra = 0;
+
+	for(i = 0 ; i < NUM_BYTES ; i++)
+	{
+		subt = *aBytes++ - *bBytes++ - sobra;
+		if(subt < 0) {
+			sobra = 1;
+			subt += 0xff;
+		}
+		else
+		{
+			sobra = 0;
+		}
+		*resBytes++ = subt;
+	}
+}
+
 void big_val (BigInt res, int val)
 {
 	int * n = (int *) res;
