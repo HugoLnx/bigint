@@ -4,8 +4,8 @@
 #define NUM_BYTES 16
 typedef unsigned char BigInt[NUM_BYTES];
 
-void zerarBytes(BigInt res);
-void zerarBytesCom(BigInt res, char byte);
+void zerar_bytes(BigInt res);
+void zerar_bytes_com(BigInt res, char byte);
 unsigned char bit_pow(unsigned char n, unsigned char exp);
 
 void big_sum (BigInt res, BigInt a, BigInt b)
@@ -109,11 +109,11 @@ void big_val (BigInt res, int val)
 
 	if ( bit_do_sinal == 0x01 )
 	{
-		zerarBytesCom(res, 0xff);
+		zerar_bytes_com(res, 0xff);
 	}
 	else
 	{
-		zerarBytesCom(res, 0x00);
+		zerar_bytes_com(res, 0x00);
 	}
 	
 	*n = val;
@@ -122,7 +122,7 @@ void big_val (BigInt res, int val)
 void big_uval (BigInt res, unsigned int uval)
 {
 	unsigned int * n = (unsigned int *) res; 
-	zerarBytes(res);
+	zerar_bytes(res);
 	*n = uval;
 }
 
@@ -136,7 +136,7 @@ int big_cast_int(BigInt res)
 	return *((int *) res);
 }
 
-void zerarBytesCom(BigInt res, char byte)
+void zerar_bytes_com(BigInt res, char byte)
 {
 	int i;
 	char * bytes = (char *) res;
@@ -148,9 +148,9 @@ void zerarBytesCom(BigInt res, char byte)
 }
 
 
-void zerarBytes(BigInt res)
+void zerar_bytes(BigInt res)
 {
-	zerarBytesCom(res, 0);
+	zerar_bytes_com(res, 0);
 }
 
 unsigned char bit_pow(unsigned char n, unsigned char exp)
