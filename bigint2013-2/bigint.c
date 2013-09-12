@@ -1,10 +1,12 @@
 #include<stdio.h>
+#include<math.h>
 
 #define NUM_BYTES 16
 typedef unsigned char BigInt[NUM_BYTES];
 
 void zerarBytes(BigInt res);
 void zerarBytesCom(BigInt res, char byte);
+unsigned char bit_pow(unsigned char n, unsigned char exp);
 
 void big_sum (BigInt res, BigInt a, BigInt b)
 {
@@ -54,22 +56,24 @@ void big_sub (BigInt res, BigInt a, BigInt b)
 	}
 }
 
-
 void big_shl (BigInt res, BigInt a, int n)
 {
 	int byte;
 	unsigned char * resBytes = (unsigned char*) res;
 	unsigned char * aBytes = (unsigned char*) a;
+	unsigned char bits_iniciais = 0;
+	unsigned char qnt_bits;
 
 	resBytes += n / 8;
-	if ( n % 8 )
-	{
-		resBytes--;
-	}
+
+	qnt_bits = n % 8;
 
 	for ( byte = 0 ; byte < NUM_BYTES - n / 8 ; byte++ )
 	{
-		*(resBytes++) = (*aBytes++);
+		*resBytes = *aBytes * bit_pow(2, qnt_bits) + bits_iniciais;
+		bits_iniciais = *aBytes / bit_pow(2, 8 - qnt_bits);
+		resBytes++;
+		aBytes++;
 	}
 }
 
@@ -124,4 +128,9 @@ void zerarBytesCom(BigInt res, char byte)
 void zerarBytes(BigInt res)
 {
 	zerarBytesCom(res, 0);
+}
+
+unsigned char bit_pow(unsigned char n, unsigned char exp)
+{
+	return (unsigned char) pow((double) n, (double) exp); 
 }
