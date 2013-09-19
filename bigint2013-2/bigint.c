@@ -174,3 +174,56 @@ unsigned char byte_shift_direita(unsigned char bits, unsigned char qnt_bits)
 	unsigned char pow_result = bit_pow(2, qnt_bits);
 	return (pow_result == 0 ? 0 : bits / pow_result);
 }
+
+int EhIgual(BigInt a, BigInt b)
+{
+	int ehIgual = 1;
+	int i = 0;
+	for(i = 0; i < NUM_BYTES; i++)
+	{
+		if(a[i] != b[i])
+		{
+			ehIgual = 0;
+			break;
+		}
+	}
+
+	if(ehIgual)
+		return ehIgual;
+
+	return 0;
+}
+
+int EhMenor(BigInt a, BigInt b)
+{
+	int i;
+	int ehMenor = 0;
+	for(i = NUM_BYTES-1; i >= 0; i--)
+	{
+		if(a[i] < b[i])
+		{
+			ehMenor = 1;
+			break;
+		}
+	}
+
+	if(ehMenor)
+		return ehMenor;
+
+	return 0;
+
+}
+
+/* Comparacao: retorna -1 (a < b), 0 (a == b), 1 (a > b) */
+int big_ucmp(BigInt a, BigInt b)
+{
+	if(EhIgual(a,b))
+		return 0;
+	else
+	{
+		if(EhMenor(a,b))
+			return -1;
+		else
+			return 1;
+	}
+}
