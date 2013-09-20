@@ -194,13 +194,18 @@ int EhIgual(BigInt a, BigInt b)
 	return 0;
 }
 
-int EhMenor(BigInt a, BigInt b)
+int EhMenorForUnsigned(BigInt a, BigInt b)
 {
 	int i;
 	int ehMenor = 0;
+	unsigned char cast_a;
+	unsigned char cast_b;
 	for(i = NUM_BYTES-1; i >= 0; i--)
 	{
-		if(a[i] < b[i])
+		cast_a = (char)a[i];
+		cast_b = (char)b[i];
+
+		if(cast_a > cast_b)
 		{
 			ehMenor = 1;
 			break;
@@ -214,6 +219,25 @@ int EhMenor(BigInt a, BigInt b)
 
 }
 
+int EhMenor(BigInt a, BigInt b)
+{
+	int i;
+
+	/* itera pelo BigInt partindo dos bits mais segnificativos */
+	for(i = NUM_BYTES-1; i >= 0; i--)
+	{
+		// Se ambos forem 0x00 ou se forem iguais, continua a iteração
+		if((a[i] == 0x00) && (b[i] == 0x00) || a[i] == b[i])
+			continue;
+
+		// Caso o byte corrente de a for maior que o de b, então o Big int a é maior que o BigInt b
+		if(a[i] > b[i])
+			return 0;
+
+		return 1;
+	}
+}
+
 /* Comparacao: retorna -1 (a < b), 0 (a == b), 1 (a > b) */
 int big_ucmp(BigInt a, BigInt b)
 {
@@ -222,6 +246,22 @@ int big_ucmp(BigInt a, BigInt b)
 	else
 	{
 		if(EhMenor(a,b))
+			return -1;
+		else
+			return 1;
+	}
+}
+
+int big_cmp(BigInt a, BigInt b)
+{
+	unsigned char * aBytes = (unsigned char*) a;
+	unsigned char * bBytes = (unsigned char*) b;
+
+	if(EhIgual(a,b))
+		return 0;
+	else
+	{
+		if(EhMenorForUnsigned(a,b))
 			return -1;
 		else
 			return 1;

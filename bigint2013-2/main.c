@@ -7,6 +7,14 @@ int assertsFalharam = 0;
 
 char * testName;
 
+void dump (void *p, int n) {
+  unsigned char *p1 = p;
+  while (n--) {
+    printf("%p - %02x\n", p1, *p1);
+    p1++;
+  }
+}
+
 void assert(unsigned int esperado, unsigned int obtido)
 {
 	if (esperado == obtido)
@@ -85,7 +93,7 @@ char * bytesFrom(char b1, char b2, char b3, char b4,
 int main() {
 	BigInt big, a, b;
 	unsigned int uint;
-	int vint;
+	int vint,i,j;
 
 	test("cast_uint após big_uval tem que permanecer o mesmo valor");
 	big_uval(big, 33);
@@ -330,9 +338,11 @@ int main() {
 		0x00, 0x00, 0x00, 0x00
 	), big);
 
+	//-----------------------------------------------------------------------------------
+
 	test("testar se 1 == 1");
-	big_val(a, 1);
-	big_val(b, 1);
+	big_uval(a, 0);
+	big_uval(b, 0);
 
 	vint = big_ucmp(a,b);
 
@@ -345,8 +355,8 @@ int main() {
 
 
 	test("testar se 1 < 20");
-	big_val(a, 1);
-	big_val(b, 20);
+	big_uval(a, 1);
+	big_uval(b, 20);
 
 	vint = big_ucmp(a,b);
 
@@ -357,9 +367,66 @@ int main() {
 		0xFF, 0xFF, 0xFF, 0xFF
 	), &vint,4);
 
-	test("testar se 20 < 1");
-	big_val(a, 20);
-	big_val(b, 1);
+	test("testar se 10000 > 1999");
+
+
+	for(i = 2, j = 1; i < 2000; i++, j++)
+	{
+		big_uval(a, i);
+		big_uval(b, j);
+
+		vint = big_ucmp(a,b);
+
+		assertBytes(bytesFrom(
+		0x01, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00
+	), &vint,4);
+
+
+		big_uval(a, j);
+		big_uval(b, i);
+
+		vint = big_ucmp(a,b);
+
+		assertBytes(bytesFrom(
+		0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF
+	), &vint,4);
+
+		big_uval(a, i);
+		big_uval(b, i);
+
+		vint = big_ucmp(a,b);
+
+		assertBytes(bytesFrom(
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00
+	), &vint,4);
+
+	}
+
+	big_uval(a, 10000);
+	big_uval(b, 1999);
+
+	assertBytesBI(bytesFrom(
+		0x10, 0x27, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00
+	), a);
+
+	assertBytesBI(bytesFrom(
+		0xCF, 0x07, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00
+	), b);
 
 	vint = big_ucmp(a,b);
 
@@ -369,6 +436,26 @@ int main() {
 		0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00
 	), &vint,4);
+
+
+	//-----------------------------------------------------------------------------------
+
+
+	/* Comparacao: retorna -1 (a < b), 0 (a == b), 1 (a > b) */
+
+	/*test("testar se 100 > -3000");
+	big_val(a, 100);
+	big_val(b, -3000);
+
+	vint = big_cmp(a,b);
+
+	assertBytes(bytesFrom(
+		0x01, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00
+	), &vint,4);*/
+
 
 
 	reportarTestes();
