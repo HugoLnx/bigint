@@ -194,28 +194,80 @@ int EhIgual(BigInt a, BigInt b)
 	return 0;
 }
 
-int EhMenorForUnsigned(BigInt a, BigInt b)
+int EhNegativo(BigInt a)
 {
-	int i;
-	int ehMenor = 0;
-	unsigned char cast_a;
-	unsigned char cast_b;
-	for(i = NUM_BYTES-1; i >= 0; i--)
-	{
-		cast_a = (char)a[i];
-		cast_b = (char)b[i];
+	char val = a[NUM_BYTES-1];
+	char bit_do_sinal = (val & 0x80000000) == 0x80000000;
 
-		if(cast_a > cast_b)
-		{
-			ehMenor = 1;
-			break;
-		}
+	if ( bit_do_sinal == 0x01 )
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+void InvertePorComplementoA2(BigInt a, BigInt res)
+{
+	BigInt* retorno;
+	BigInt um;
+	BigInt resultado;
+	BigInt aux_a;
+
+	int i;
+	big_val(um,1);
+	for(i = 0; i < NUM_BYTES; i++)
+	{
+		aux_a[i] = ~a[i];
 	}
 
-	if(ehMenor)
-		return ehMenor;
+	big_sum(res,aux_a,um);
 
-	return 0;
+}
+
+int EhMenorForSigned(BigInt a, BigInt b)
+{
+	int i;
+	BigInt a_complementoA2;
+	BigInt b_complementoA2;
+
+	if(EhNegativo(a) && !(EhNegativo(b)))
+	{
+		InvertePorComplementoA2(a, a_complementoA2);
+
+		return EhMenor(b,a_complementoA2);
+	}
+	else if(!EhNegativo(a) && (EhNegativo(b)))
+	{
+		InvertePorComplementoA2(b, b_complementoA2);
+
+		return EhMenor(b_complementoA2,a);
+	}
+	else if(EhNegativo(a) && (EhNegativo(b)))
+	{
+		InvertePorComplementoA2(a, a_complementoA2);
+		InvertePorComplementoA2(b, b_complementoA2);
+		
+		return EhMenor(b_complementoA2,a_complementoA2);
+		
+	}
+
+
+	/* itera pelo BigInt partindo dos bits mais segnificativos */
+	for(i = NUM_BYTES-1; i >= 0; i--)
+	{
+		// Se ambos forem 0xFF ou se forem iguais, continua a iteração
+		if((a[i] == 0xFF) && (b[i] == 0xFF) || a[i] == b[i])
+			continue;
+
+		// Caso o byte corrente de a for maior que o de b, então o Big int a é maior que o BigInt b
+		if(a[i] > b[i])
+			return 0;
+
+		return 1;
+	}
 
 }
 
@@ -254,14 +306,13 @@ int big_ucmp(BigInt a, BigInt b)
 
 int big_cmp(BigInt a, BigInt b)
 {
-	unsigned char * aBytes = (unsigned char*) a;
-	unsigned char * bBytes = (unsigned char*) b;
+	
 
 	if(EhIgual(a,b))
 		return 0;
 	else
 	{
-		if(EhMenorForUnsigned(a,b))
+		if(EhMenorForSigned(a,b))
 			return -1;
 		else
 			return 1;
