@@ -355,4 +355,9 @@ void big_umul (BigInt res, BigInt a, BigInt b)
 	}
 }
 
+void big_mul (BigInt res, BigInt a, BigInt b)
+{
+	big_umul(res,a,b);
+}
+
 
