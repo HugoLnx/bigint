@@ -175,6 +175,7 @@ unsigned char byte_shift_direita(unsigned char bits, unsigned char qnt_bits)
 	return (pow_result == 0 ? 0 : bits / pow_result);
 }
 
+/* checa se o dois bigints sao iguais */
 int EhIgual(BigInt a, BigInt b)
 {
 	int ehIgual = 1;
@@ -194,6 +195,7 @@ int EhIgual(BigInt a, BigInt b)
 	return 0;
 }
 
+/* checa se o big int é negativo */
 int EhNegativo(BigInt a)
 {
 	char val = a[NUM_BYTES-1];
@@ -209,20 +211,19 @@ int EhNegativo(BigInt a)
 	}
 }
 
+/* transforama numero negativo em positivo e vice-versa */
 void InvertePorComplementoA2(BigInt a, BigInt res)
 {
-	BigInt* retorno;
-	BigInt um;
-	BigInt resultado;
-	BigInt aux_a;
-
+	BigInt um; // bigint contendo valor 1
+	BigInt aux_a; // bigint que auxilia na conversao de 'a'
 	int i;
+
 	big_val(um,1);
 	for(i = 0; i < NUM_BYTES; i++)
-	{
+		/* inverte bytes bit a bit */
 		aux_a[i] = ~a[i];
-	}
 
+    /* soma + 1 para obter o valor correto */
 	big_sum(res,aux_a,um);
 
 }
@@ -233,28 +234,34 @@ int EhMenorForSigned(BigInt a, BigInt b)
 	BigInt a_complementoA2;
 	BigInt b_complementoA2;
 
+
+	/* Se 'a' for negativo e 'b' não */
 	if(EhNegativo(a) && !(EhNegativo(b)))
 	{
+		/* converte 'a' para positivo */
 		InvertePorComplementoA2(a, a_complementoA2);
 
 		return EhMenor(b,a_complementoA2);
 	}
+	/* Se 'a' for negativo e 'b' não  */
 	else if(!EhNegativo(a) && (EhNegativo(b)))
 	{
+		/* converte 'b' para positivo */
 		InvertePorComplementoA2(b, b_complementoA2);
 
 		return EhMenor(b_complementoA2,a);
 	}
+	/* Se ambos forem negativos */
 	else if(EhNegativo(a) && (EhNegativo(b)))
 	{
+		/* converte ambos para positivo */
 		InvertePorComplementoA2(a, a_complementoA2);
 		InvertePorComplementoA2(b, b_complementoA2);
 		
 		return EhMenor(b_complementoA2,a_complementoA2);
-		
 	}
 
-
+	/* Se ambos fore positivos */
 	/* itera pelo BigInt partindo dos bits mais segnificativos */
 	for(i = NUM_BYTES-1; i >= 0; i--)
 	{
@@ -268,7 +275,6 @@ int EhMenorForSigned(BigInt a, BigInt b)
 
 		return 1;
 	}
-
 }
 
 int EhMenor(BigInt a, BigInt b)
@@ -303,11 +309,9 @@ int big_ucmp(BigInt a, BigInt b)
 			return 1;
 	}
 }
-
+/* Comparacao: retorna -1 (a < b), 0 (a == b), 1 (a > b) */
 int big_cmp(BigInt a, BigInt b)
 {
-	
-
 	if(EhIgual(a,b))
 		return 0;
 	else
