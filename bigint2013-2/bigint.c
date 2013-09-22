@@ -10,6 +10,15 @@ unsigned char bit_pow(unsigned char n, unsigned char exp);
 unsigned char byte_shift_esquerda(unsigned char bits, unsigned char qnt_bits);
 unsigned char byte_shift_direita(unsigned char bits, unsigned char qnt_bits);
 
+void bigint_copy(BigInt res, BigInt a)
+{
+	int i = 0;
+	for(i = 0; i < NUM_BYTES; i++)
+	{
+		res[i] = a[i];
+	}
+}
+
 void big_sum (BigInt res, BigInt a, BigInt b)
 {
 	int i;
@@ -322,3 +331,28 @@ int big_cmp(BigInt a, BigInt b)
 			return 1;
 	}
 }
+
+void big_umul (BigInt res, BigInt a, BigInt b)
+{
+
+	BigInt um, zero, aux_a, aux_b, aux_res;
+	big_uval(zero,0);
+	big_uval(res,0);
+	big_uval(um,1);
+	while(big_ucmp(b,zero))
+	{
+		if(b[0]&1)
+		{
+			big_sum(aux_res,res,a);
+			bigint_copy(res,aux_res);
+		}
+
+		big_shl(aux_a,a,1);
+		bigint_copy(a,aux_a);
+
+		big_shr(aux_b,b,1);
+		bigint_copy(b,aux_b);
+	}
+}
+
+
