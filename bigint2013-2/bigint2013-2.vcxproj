@@ -83,7 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bigint.c" />
-    <ClCompile Include="main.c" />
+    <ClCompile Include="teste.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bigint.h" />
