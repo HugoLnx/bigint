@@ -1,5 +1,4 @@
 #include<stdio.h>
-#include<math.h>
 
 /* Hugo Roque de Figueiredo 1311162 */
 /* Robert Correa dos Santos 1210325 */
@@ -173,7 +172,13 @@ void zerar_bytes(BigInt res)
 
 unsigned char bit_pow(unsigned char n, unsigned char exp)
 {
-	return (unsigned char) pow((double) n, (double) exp); 
+	unsigned char i;
+	unsigned char res = 1;
+	for(i = 0; i < exp; i++)
+	{
+		res *= n;
+	}
+	return res; 
 }
 
 
