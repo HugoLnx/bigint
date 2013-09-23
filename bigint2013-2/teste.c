@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "bigint.h"
 
+/* Hugo Roque de Figueiredo 1311162 */
+/* Robert Correa dos Santos 1210325 */
 
 int assertsPassaram = 0;
 int assertsFalharam = 0;

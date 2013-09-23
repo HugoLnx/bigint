@@ -1,6 +1,9 @@
 #include<stdio.h>
 #include<math.h>
 
+/* Hugo Roque de Figueiredo 1311162 */
+/* Robert Correa dos Santos 1210325 */
+
 #define NUM_BYTES 16
 typedef unsigned char BigInt[NUM_BYTES];
 
