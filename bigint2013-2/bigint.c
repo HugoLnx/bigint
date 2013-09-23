@@ -102,6 +102,8 @@ void big_shr (BigInt res, BigInt a, int n)
 	resBytes += NUM_BYTES - n / 8 - 1;
 	aBytes += NUM_BYTES - 1;
 
+	zerar_bytes(res);
+
 	qnt_bits = n % 8;
 
 	for ( byte = 0 ; byte < NUM_BYTES - n / 8 ; byte++ )
