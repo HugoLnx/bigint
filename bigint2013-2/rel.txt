@@ -1,2 +1,120 @@
-Hugo Roque de Figueiredo 1311162
-Robert Correa dos Santos 1210325
+/*Hugo Roque de Figueiredo 1311162*/
+/*Robert Correa dos Santos 1210325*/
+
+
+==> big_mul e big_umul
+	Para essas funções realizamos testes para valores negativos e positivos e checamos se os sinais mudavam de forma correta. Também foram realizados testes com o valor 0;
+	Exemplos:
+
+	|test("1*2 = 2");
+	|big_uval(a, 1);
+	|big_uval(b, 2);
+	|big_umul(big, a, b);
+	|assertBytesBI(bytesFrom(
+	|	0x02, 0x00, 0x00, 0x00,
+	|	0x00, 0x00, 0x00, 0x00,
+	|	0x00, 0x00, 0x00, 0x00,
+	|	0x00, 0x00, 0x00, 0x00
+	|), big);
+
+	|test("99999*99999 = 9999800001");
+	|big_uval(a, 99999);
+	|big_uval(b, 99999);
+	|big_umul(big, a, b);
+	|assertBytesBI(bytesFrom(
+	|	0xC1, 0xD6, 0x08, 0x54,
+	|	0x02, 0x00, 0x00, 0x00,
+	|	0x00, 0x00, 0x00, 0x00,
+	|	0x00, 0x00, 0x00, 0x00
+	|), big);
+
+	|test("5*-2 = -10");
+	|big_val(a, 5);
+	|big_val(b, -2);
+	|big_val(big, 0);
+	|big_mul(big, a, b);
+	|assertBytesBI(bytesFrom(
+	|	0xF6, 0xFF, 0xFF, 0xFF,
+	|	0xFF, 0xFF, 0xFF, 0xFF,
+	|	0xFF, 0xFF, 0xFF, 0xFF,
+	|	0xFF, 0xFF, 0xFF, 0xFF
+	|), big);
+
+	|test("-2*-2 = 4");
+	|big_val(a, -2);
+	|big_val(b, -2);
+	|big_val(big, 0);
+	|big_mul(big, a, b);
+	|assertBytesBI(bytesFrom(
+	|	0x04, 0x00, 0x00, 0x00,
+	|	0x00, 0x00, 0x00, 0x00,
+	|	0x00, 0x00, 0x00, 0x00,
+	|	0x00, 0x00, 0x00, 0x00
+	|), big);
+
+	|test("99999*0 = 0");
+	|big_uval(a, 99999);
+	|big_uval(b, 0);
+	|big_umul(big, a, b);
+	|assertBytesBI(bytesFrom(
+	|	0x00, 0x00, 0x00, 0x00,
+	|	0x00, 0x00, 0x00, 0x00,
+	|	0x00, 0x00, 0x00, 0x00,
+	|	0x00, 0x00, 0x00, 0x00
+	|), big);
+
+
+==> big_cmp e big_ucmp
+	Testes foram realizados levando em conta valores partindo do negativo até o positivo, passando pelo zero.
+	Exemplo:
+
+	caso "menor que"
+	 
+	|for(i = -2000, j= -1999; i < 2000; i++, j++)
+	|{
+	|	big_val(a, i);
+	|	big_val(b, j);
+	|
+	|	valor_inteiro = big_cmp(a,b);
+	|
+	|	assertBytes(bytesFrom(
+	|		0xFF, 0xFF, 0xFF, 0xFF,
+	|		0xFF, 0xFF, 0xFF, 0xFF,
+	|		0xFF, 0xFF, 0xFF, 0xFF,
+	|		0xFF, 0xFF, 0xFF, 0xFF
+	|		), &valor_inteiro,4);
+	|}
+
+	caso "maior que"
+
+	|for(i = -1999, j= -2000; i < 2000; i++, j++)
+	|{
+	|	big_val(a, i);
+	|	big_val(b, j);
+	|
+	|	valor_inteiro = big_cmp(a,b);
+	|
+	|	assertBytes(bytesFrom(
+	|		0x01, 0x00, 0x00, 0x00,
+	|		0x00, 0x00, 0x00, 0x00,
+	|		0x00, 0x00, 0x00, 0x00,
+	|		0x00, 0x00, 0x00, 0x00
+	|		), &valor_inteiro,4);
+	|}
+
+	caso "igualdade"
+	
+	|for(i = -2000; i < 2000; i++)
+	|{
+	|	big_val(a, i);
+	|	big_val(b, i);
+	|
+	|	valor_inteiro = big_cmp(a,b);
+	|
+	|	assertBytes(bytesFrom(
+	|	0x00, 0x00, 0x00, 0x00,
+	|	0x00, 0x00, 0x00, 0x00,
+	|	0x00, 0x00, 0x00, 0x00,
+	|	0x00, 0x00, 0x00, 0x00
+	|	), &valor_inteiro,4);
+	|}
