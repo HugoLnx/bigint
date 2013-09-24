@@ -75,7 +75,7 @@ void big_sum (BigInt res, BigInt a, BigInt b)
 		{
 			sobra = 0;
 		}
-		*resBytes++ = soma;
+		*resBytes++ = (unsigned char) soma;
 	}
 }
 
@@ -101,7 +101,7 @@ void big_sub (BigInt res, BigInt a, BigInt b)
 		{
 			sobra = 0;
 		}
-		*resBytes++ = subt;
+		*resBytes++ = (unsigned char) subt;
 	}
 }
 
