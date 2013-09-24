@@ -5,11 +5,11 @@
 #include "bigint.h"
 
 /*-------Protótipos das funções encapsuladas-------*/
-int IsLessThan(BigInt a, BigInt b);
-int IsLessThanForSigned(BigInt a, BigInt b);
-void Reverse(BigInt a, BigInt res);
-int IsNegative(BigInt a);
-int IsEqual(BigInt a, BigInt b);
+int is_less_than(BigInt a, BigInt b);
+int is_less_than_for_signed(BigInt a, BigInt b);
+void reverse(BigInt a, BigInt res);
+int is_negative(BigInt a);
+int is_equal(BigInt a, BigInt b);
 void big_copy(BigInt res, BigInt a);
 void reset_bytes(BigInt res);
 void reset_bytes_with(BigInt res, char byte);
@@ -191,11 +191,11 @@ void big_shr (BigInt res, BigInt a, int n)
 /* comparacao com sinal */
 int big_cmp(BigInt a, BigInt b)
 {
-	if(IsEqual(a,b))
+	if(is_equal(a,b))
 		return 0;
 	else
 	{
-		if(IsLessThanForSigned(a,b))
+		if(is_less_than_for_signed(a,b))
 			return -1;
 		else
 			return 1;
@@ -205,11 +205,11 @@ int big_cmp(BigInt a, BigInt b)
 /* comparacao sem sinal */
 int big_ucmp(BigInt a, BigInt b)
 {
-	if(IsEqual(a,b))
+	if(is_equal(a,b))
 		return 0;
 	else
 	{
-		if(IsLessThan(a,b))
+		if(is_less_than(a,b))
 			return -1;
 		else
 			return 1;
@@ -263,7 +263,7 @@ unsigned char byte_shift_direita(unsigned char bits, unsigned char qnt_bits)
 }
 
 /* Checa se o dois BigInts sao iguais */
-int IsEqual(BigInt a, BigInt b)
+int is_equal(BigInt a, BigInt b)
 {
 	int i = 0;
 	for(i = 0; i < NUM_BYTES; i++)
@@ -276,7 +276,7 @@ int IsEqual(BigInt a, BigInt b)
 }
 
 /* Checa se o BigInt é negativo */
-int IsNegative(BigInt a)
+int is_negative(BigInt a)
 {
 	char val = a[NUM_BYTES-1];
 	char bit_do_sinal = (val & 0x80000000) == 0x80000000;
@@ -288,7 +288,7 @@ int IsNegative(BigInt a)
 }
 
 /* Transforama número negativo em positivo e vice-versa */
-void Reverse(BigInt a, BigInt res)
+void reverse(BigInt a, BigInt res)
 {
 	BigInt um; // bigint contendo valor 1
 	BigInt aux_a; // bigint que auxilia na conversao de 'a'
@@ -304,36 +304,36 @@ void Reverse(BigInt a, BigInt res)
 
 }
 
-int IsLessThanForSigned(BigInt a, BigInt b)
+int is_less_than_for_signed(BigInt a, BigInt b)
 {
 	int i;
 	BigInt a_complementoA2;
 	BigInt b_complementoA2;
 
 	/* Se 'a' for negativo e 'b' não */
-	if(IsNegative(a) && !(IsNegative(b)))
+	if(is_negative(a) && !(is_negative(b)))
 	{
 		/* converte 'a' para positivo */
-		Reverse(a, a_complementoA2);
+		reverse(a, a_complementoA2);
 
-		return IsLessThan(b,a_complementoA2);
+		return is_less_than(b,a_complementoA2);
 	}
 	/* Se 'a' for negativo e 'b' não  */
-	else if(!IsNegative(a) && (IsNegative(b)))
+	else if(!is_negative(a) && (is_negative(b)))
 	{
 		/* converte 'b' para positivo */
-		Reverse(b, b_complementoA2);
+		reverse(b, b_complementoA2);
 
-		return IsLessThan(b_complementoA2,a);
+		return is_less_than(b_complementoA2,a);
 	}
 	/* Se ambos forem negativos */
-	else if((IsNegative(a)) && (IsNegative(b)))
+	else if((is_negative(a)) && (is_negative(b)))
 	{
 		/* converte ambos para positivo */
-		Reverse(a, a_complementoA2);
-		Reverse(b, b_complementoA2);
+		reverse(a, a_complementoA2);
+		reverse(b, b_complementoA2);
 		
-		return IsLessThan(b_complementoA2,a_complementoA2);
+		return is_less_than(b_complementoA2,a_complementoA2);
 	}
 
 	/* Se ambos fore positivos */
@@ -355,7 +355,7 @@ int IsLessThanForSigned(BigInt a, BigInt b)
 	return -1;
 }
 
-int IsLessThan(BigInt a, BigInt b)
+int is_less_than(BigInt a, BigInt b)
 {
 	int i;
 
