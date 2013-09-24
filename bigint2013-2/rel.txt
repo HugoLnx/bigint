@@ -1,67 +1,178 @@
-/*Hugo Roque de Figueiredo 1311162*/
-/*Robert Correa dos Santos 1210325*/
+Hugo Roque de Figueiredo 1311162
+Robert Correa dos Santos 1210325
+
+==> Funções auxiliares para log de testes
+Implementamos a função test, que recebe o nome do caso de teste para que possamos identificar o erro caso ocorra. Por exemplo, caso tenhamos o seguinte teste:
+	| test("big_uval => 1 como: 0x00(15x) 0x02");
+  | big_uval(big, 1);
+  | assertBytesBI(bytesFrom(
+  | 	0x02, 0x00, 0x00, 0x00,
+  | 	0x00, 0x00, 0x00, 0x00,
+  | 	0x00, 0x00, 0x00, 0x00,
+  | 	0x00, 0x00, 0x00, 0x00
+  | ), big);
+
+O output é:
+
+  | [big_uval => 1 como: 0x00(15x) 0x02]: erro bytes errados:
+  | esperado > obtido
+  | 02 > 01
+  | 00 > 00
+  | 00 > 00
+  | 00 > 00
+  | 00 > 00
+  | 00 > 00
+  | 00 > 00
+  | 00 > 00
+  | 00 > 00
+  | 00 > 00
+  | 00 > 00
+  | 00 > 00
+  | 00 > 00
+  | 00 > 00
+  | 00 > 00
+  | 00 > 00
+  | Passaram: 18039    Falharam: 1
+
+Consertando o teste, obteremos o seguinte log:
+  | Passaram: 18040    Falharam: 0
+
+
+==> Testando big_val e big_uval
+Para facilitar o teste, implementamos uma função, que fazia a asserção dos bytes de um bigint. Ou seja, a função recebia o bigint e uma array de chars, que representa os bytes, para comparação. Inclusive essa função pode receber um int, dessa forma poderíamos verificar se o tratamento do nosso novo tipo era equivalente ao int para valores que caibam em 4 bytes. Segue um exemplo de teste:
+
+	| test("big_uval => 1 como: 0x00(15x) 0x01");
+  | big_uval(big, 1);
+  | assertBytesBI(bytesFrom(
+  | 	0x01, 0x00, 0x00, 0x00,
+  | 	0x00, 0x00, 0x00, 0x00,
+  | 	0x00, 0x00, 0x00, 0x00,
+  | 	0x00, 0x00, 0x00, 0x00
+  | ), big);
+
+
+==> big_sum e big_sub
+Seguimos a mesma estratégia do big_val, usando a asseção de bytes. Sendo que tomamos cuidado para tratar o overflow de um byte.
+  | test("1 + 1 = 0x02 0x00(15x)");
+  | big_val(a, 1);
+  | big_sum(big, a, a);
+  | assertBytesBI(bytesFrom(
+  | 	0x02, 0x00, 0x00, 0x00,
+  | 	0x00, 0x00, 0x00, 0x00,
+  | 	0x00, 0x00, 0x00, 0x00,
+  | 	0x00, 0x00, 0x00, 0x00
+  | ), big);
+
+  | test("uval: 255 + 1 = 0x00 0x01 0x00(14x)");
+  | big_uval(a, 0xff);
+  | big_uval(b, 0x01);
+  | big_sum(big, a, b);
+  | assertBytesBI(bytesFrom(
+  | 	0x00, 0x01, 0x00, 0x00,
+  | 	0x00, 0x00, 0x00, 0x00,
+  | 	0x00, 0x00, 0x00, 0x00,
+  | 	0x00, 0x00, 0x00, 0x00
+  | ), big);
 
 
 ==> big_mul e big_umul
 	Para essas funções realizamos testes para valores negativos e positivos e checamos se os sinais mudavam de forma correta. Também foram realizados testes com o valor 0;
 	Exemplos:
 
-	|test("1*2 = 2");
-	|big_uval(a, 1);
-	|big_uval(b, 2);
-	|big_umul(big, a, b);
-	|assertBytesBI(bytesFrom(
-	|	0x02, 0x00, 0x00, 0x00,
-	|	0x00, 0x00, 0x00, 0x00,
-	|	0x00, 0x00, 0x00, 0x00,
-	|	0x00, 0x00, 0x00, 0x00
-	|), big);
+	| test("1*2 = 2");
+	| big_uval(a, 1);
+	| big_uval(b, 2);
+	| big_umul(big, a, b);
+	| assertBytesBI(bytesFrom(
+	| 	0x02, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00
+	| ), big);
 
-	|test("99999*99999 = 9999800001");
-	|big_uval(a, 99999);
-	|big_uval(b, 99999);
-	|big_umul(big, a, b);
-	|assertBytesBI(bytesFrom(
-	|	0xC1, 0xD6, 0x08, 0x54,
-	|	0x02, 0x00, 0x00, 0x00,
-	|	0x00, 0x00, 0x00, 0x00,
-	|	0x00, 0x00, 0x00, 0x00
-	|), big);
+	| test("99999*99999 = 9999800001");
+	| big_uval(a, 99999);
+	| big_uval(b, 99999);
+	| big_umul(big, a, b);
+	| assertBytesBI(bytesFrom(
+	| 	0xC1, 0xD6, 0x08, 0x54,
+	| 	0x02, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00
+	| ), big);
 
-	|test("5*-2 = -10");
-	|big_val(a, 5);
-	|big_val(b, -2);
-	|big_val(big, 0);
-	|big_mul(big, a, b);
-	|assertBytesBI(bytesFrom(
-	|	0xF6, 0xFF, 0xFF, 0xFF,
-	|	0xFF, 0xFF, 0xFF, 0xFF,
-	|	0xFF, 0xFF, 0xFF, 0xFF,
-	|	0xFF, 0xFF, 0xFF, 0xFF
-	|), big);
+	| test("5*-2 = -10");
+	| big_val(a, 5);
+	| big_val(b, -2);
+	| big_val(big, 0);
+	| big_mul(big, a, b);
+	| assertBytesBI(bytesFrom(
+	| 	0xF6, 0xFF, 0xFF, 0xFF,
+	| 	0xFF, 0xFF, 0xFF, 0xFF,
+	| 	0xFF, 0xFF, 0xFF, 0xFF,
+	| 	0xFF, 0xFF, 0xFF, 0xFF
+	| ), big);
 
-	|test("-2*-2 = 4");
-	|big_val(a, -2);
-	|big_val(b, -2);
-	|big_val(big, 0);
-	|big_mul(big, a, b);
-	|assertBytesBI(bytesFrom(
-	|	0x04, 0x00, 0x00, 0x00,
-	|	0x00, 0x00, 0x00, 0x00,
-	|	0x00, 0x00, 0x00, 0x00,
-	|	0x00, 0x00, 0x00, 0x00
-	|), big);
+	| test("-2*-2 = 4");
+	| big_val(a, -2);
+	| big_val(b, -2);
+	| big_val(big, 0);
+	| big_mul(big, a, b);
+	| assertBytesBI(bytesFrom(
+	| 	0x04, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00
+	| ), big);
 
-	|test("99999*0 = 0");
-	|big_uval(a, 99999);
-	|big_uval(b, 0);
-	|big_umul(big, a, b);
-	|assertBytesBI(bytesFrom(
-	|	0x00, 0x00, 0x00, 0x00,
-	|	0x00, 0x00, 0x00, 0x00,
-	|	0x00, 0x00, 0x00, 0x00,
-	|	0x00, 0x00, 0x00, 0x00
-	|), big);
+	| test("99999*0 = 0");
+	| big_uval(a, 99999);
+	| big_uval(b, 0);
+	| big_umul(big, a, b);
+	| assertBytesBI(bytesFrom(
+	| 	0x00, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00
+	| ), big);
+
+
+
+==> big_shl e big_shr
+A estratégia de teste para essas funções foi, começar shiftando bytes inteiros:
+	| test("0x1 << 8 = 0x00 0x01 0x00 (15x)");
+	| big_uval(a, 0x1);
+	| big_shl(big, a, 8);
+	| assertBytesBI(bytesFrom(
+	| 	0x00, 0x01, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00
+	| ), big);
+
+
+Mas a implementação que faz o teste acima passar é simples demais, não funciona para shifts que não sejam de 8 bits. Por isso fiz um teste para shiftar 4 bits:
+	| test("0xa1b2c3 >> 4 = 0x2c 0x1b 0x0a 0x00 (12x)");
+	| big_val(big, -1);
+	| big_uval(a, 0xa1b2c3);
+	| big_shr(big, a, 4);
+	| assertBytesBI(bytesFrom(
+	| 	0x2c, 0x1b, 0x0a, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00
+	| ), big);
+
+Após fazer esta implementação eu fiz um shift de 1 bit:
+	| test("0x10 >> 1 = 0x08 (15x)");
+	| big_uval(a, 0x10);
+	| big_shr(big, a, 1);
+	| assertBytesBI(bytesFrom(
+	| 	0x08, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00
+	| ), big);
 
 
 ==> big_cmp e big_ucmp
@@ -70,51 +181,51 @@
 
 	caso "menor que"
 	 
-	|for(i = -2000, j= -1999; i < 2000; i++, j++)
-	|{
-	|	big_val(a, i);
-	|	big_val(b, j);
-	|
-	|	valor_inteiro = big_cmp(a,b);
-	|
-	|	assertBytes(bytesFrom(
-	|		0xFF, 0xFF, 0xFF, 0xFF,
-	|		0xFF, 0xFF, 0xFF, 0xFF,
-	|		0xFF, 0xFF, 0xFF, 0xFF,
-	|		0xFF, 0xFF, 0xFF, 0xFF
-	|		), &valor_inteiro,4);
-	|}
+	| for(i = -2000, j= -1999; i < 2000; i++, j++)
+	| {
+	| 	big_val(a, i);
+	| 	big_val(b, j);
+	| 
+	| 	valor_inteiro = big_cmp(a,b);
+	| 
+	| 	assertBytes(bytesFrom(
+	| 		0xFF, 0xFF, 0xFF, 0xFF,
+	| 		0xFF, 0xFF, 0xFF, 0xFF,
+	| 		0xFF, 0xFF, 0xFF, 0xFF,
+	| 		0xFF, 0xFF, 0xFF, 0xFF
+	| 		), &valor_inteiro,4);
+	| }
 
 	caso "maior que"
 
-	|for(i = -1999, j= -2000; i < 2000; i++, j++)
-	|{
-	|	big_val(a, i);
-	|	big_val(b, j);
-	|
-	|	valor_inteiro = big_cmp(a,b);
-	|
-	|	assertBytes(bytesFrom(
-	|		0x01, 0x00, 0x00, 0x00,
-	|		0x00, 0x00, 0x00, 0x00,
-	|		0x00, 0x00, 0x00, 0x00,
-	|		0x00, 0x00, 0x00, 0x00
-	|		), &valor_inteiro,4);
-	|}
+	| for(i = -1999, j= -2000; i < 2000; i++, j++)
+	| {
+	| 	big_val(a, i);
+	| 	big_val(b, j);
+	| 
+	| 	valor_inteiro = big_cmp(a,b);
+	| 
+	| 	assertBytes(bytesFrom(
+	| 		0x01, 0x00, 0x00, 0x00,
+	| 		0x00, 0x00, 0x00, 0x00,
+	| 		0x00, 0x00, 0x00, 0x00,
+	| 		0x00, 0x00, 0x00, 0x00
+	| 		), &valor_inteiro,4);
+	| }
 
 	caso "igualdade"
 	
-	|for(i = -2000; i < 2000; i++)
-	|{
-	|	big_val(a, i);
-	|	big_val(b, i);
-	|
-	|	valor_inteiro = big_cmp(a,b);
-	|
-	|	assertBytes(bytesFrom(
-	|	0x00, 0x00, 0x00, 0x00,
-	|	0x00, 0x00, 0x00, 0x00,
-	|	0x00, 0x00, 0x00, 0x00,
-	|	0x00, 0x00, 0x00, 0x00
-	|	), &valor_inteiro,4);
-	|}
+	| for(i = -2000; i < 2000; i++)
+	| {
+	| 	big_val(a, i);
+	| 	big_val(b, i);
+	| 
+	| 	valor_inteiro = big_cmp(a,b);
+	| 
+	| 	assertBytes(bytesFrom(
+	| 	0x00, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00,
+	| 	0x00, 0x00, 0x00, 0x00
+	| 	), &valor_inteiro,4);
+	| }
