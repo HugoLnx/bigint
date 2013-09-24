@@ -39,6 +39,3 @@ int big_cmp(BigInt a, BigInt b);
 /* comparacao sem sinal */
 int big_ucmp(BigInt a, BigInt b);
 
-unsigned int big_cast_uint(BigInt res);
-
-int big_cast_int(BigInt res);

@@ -10,12 +10,18 @@ int assertsFalharam = 0;
 
 char * testName;
 
-void dump (void *p, int n) {
-  unsigned char *p1 = p;
-  while (n--) {
-    printf("%p - %02x\n", p1, *p1);
-    p1++;
-  }
+
+
+int big_cast_int(BigInt res);
+
+unsigned int big_cast_uint(BigInt res)
+{
+	return *((unsigned int *) res);
+}
+
+int big_cast_int(BigInt res)
+{
+	return *((int *) res);
 }
 
 void assert(unsigned int esperado, unsigned int obtido)
@@ -72,7 +78,7 @@ void test(char * name)
 	testName = name;
 }
 
-void reportarTestes()
+void reportarTestes(void)
 {
 	printf("Passaram: %d    Falharam: %d\n", assertsPassaram, assertsFalharam);
 }
@@ -94,7 +100,7 @@ char * bytesFrom(char b1, char b2, char b3, char b4,
 }
 
 
-void test_big_cmp_igualdade()
+void test_big_cmp_igualdade(void)
 {
 	int i, valor_inteiro;
 	BigInt a, b;
@@ -114,7 +120,7 @@ void test_big_cmp_igualdade()
 	}
 }
 
-void test_big_cmp_menor_que()
+void test_big_cmp_menor_que(void)
 {
 	int i, j, valor_inteiro;
 	BigInt a, b;
@@ -135,7 +141,7 @@ void test_big_cmp_menor_que()
 	}
 }
 
-void test_big_cmp_maior_que()
+void test_big_cmp_maior_que(void)
 {
 	int i, j, valor_inteiro;
 	BigInt a, b;
@@ -156,7 +162,7 @@ void test_big_cmp_maior_que()
 	}
 }
 
-void test_big_cmp()
+void test_big_cmp(void)
 {
 	
 	test("bit_cmp a == b");
@@ -169,7 +175,7 @@ void test_big_cmp()
 	test_big_cmp_maior_que();
 }
 
-void test_big_ucmp_igualdade()
+void test_big_ucmp_igualdade(void)
 {
 	int i, valor_inteiro;
 	BigInt a, b;
@@ -189,7 +195,7 @@ void test_big_ucmp_igualdade()
 	}
 }
 
-void test_big_ucmp_menor_que()
+void test_big_ucmp_menor_que(void)
 {
 	int i, j, valor_inteiro;
 	BigInt a, b;
@@ -210,7 +216,7 @@ void test_big_ucmp_menor_que()
 	}
 }
 
-void test_big_ucmp_maior_que()
+void test_big_ucmp_maior_que(void)
 {
 	int i, j, valor_inteiro;
 	BigInt a, b;
@@ -231,7 +237,7 @@ void test_big_ucmp_maior_que()
 	}
 }
 
-void test_big_ucmp()
+void test_big_ucmp(void)
 {
 	test("bit_ucmp a == b");
 	test_big_ucmp_igualdade();
@@ -243,10 +249,10 @@ void test_big_ucmp()
 	test_big_ucmp_maior_que();
 }
 
-int main() {
+int main(void) {
 	BigInt big, a, b;
 	unsigned int uint;
-	int vint,i,j;
+	int vint;
 
 	test("cast_uint após big_uval tem que permanecer o mesmo valor");
 	big_uval(big, 33);

@@ -1,26 +1,59 @@
-#include<stdio.h>
-
 /* Hugo Roque de Figueiredo 1311162 */
 /* Robert Correa dos Santos 1210325 */
 
-#define NUM_BYTES 16
-typedef unsigned char BigInt[NUM_BYTES];
+#include<stdio.h>
+#include "bigint.h"
 
-void zerar_bytes(BigInt res);
-void zerar_bytes_com(BigInt res, char byte);
+/*-------Protótipos das funções encapsuladas-------*/
+int IsLessThan(BigInt a, BigInt b);
+int IsLessThanForSigned(BigInt a, BigInt b);
+void Reverse(BigInt a, BigInt res);
+int IsNegative(BigInt a);
+int IsEqual(BigInt a, BigInt b);
+void big_copy(BigInt res, BigInt a);
+void reset_bytes(BigInt res);
+void reset_bytes_with(BigInt res, char byte);
 unsigned char bit_pow(unsigned char n, unsigned char exp);
 unsigned char byte_shift_esquerda(unsigned char bits, unsigned char qnt_bits);
 unsigned char byte_shift_direita(unsigned char bits, unsigned char qnt_bits);
 
-void bigint_copy(BigInt res, BigInt a)
+/*-------FIM dos protótipos das funções encapsuladas-------*/
+
+/*-------Implementação das funções exportadas-------*/
+
+/* Atribuicao */
+
+/* res = val (extensao com sinal) */
+void big_val (BigInt res, int val)
 {
-	int i = 0;
-	for(i = 0; i < NUM_BYTES; i++)
+	int * n = (int *) res;
+	char bit_do_sinal;
+
+	bit_do_sinal = (val & 0x80000000) == 0x80000000;
+
+	if ( bit_do_sinal == 0x01 )
 	{
-		res[i] = a[i];
+		reset_bytes_with(res, 0xff);
 	}
+	else
+	{
+		reset_bytes_with(res, 0x00);
+	}
+	
+	*n = val;
 }
 
+/* res = uval (extensao sem sinal) */
+void big_uval (BigInt res, unsigned int uval)
+{
+	unsigned int * n = (unsigned int *) res; 
+	reset_bytes(res);
+	*n = uval;
+}
+
+/* Operacoes aritmeticas */
+
+/* res = a + b */
 void big_sum (BigInt res, BigInt a, BigInt b)
 {
 	int i;
@@ -33,7 +66,8 @@ void big_sum (BigInt res, BigInt a, BigInt b)
 	for(i = 0 ; i < NUM_BYTES ; i++)
 	{
 		soma = *aBytes++ + *bBytes++ + sobra;
-		if(soma > 0xff) {
+		if(soma > 0xff)
+		{
 			sobra = 1;
 			soma -= 0xff + 1;
 		}
@@ -45,6 +79,7 @@ void big_sum (BigInt res, BigInt a, BigInt b)
 	}
 }
 
+/* res = a - b */
 void big_sub (BigInt res, BigInt a, BigInt b)
 {
 	int i;
@@ -57,7 +92,8 @@ void big_sub (BigInt res, BigInt a, BigInt b)
 	for(i = 0 ; i < NUM_BYTES ; i++)
 	{
 		subt = *aBytes++ - *bBytes++ - sobra;
-		if(subt < 0) {
+		if(subt < 0) 
+		{
 			sobra = 1;
 			subt += 0xff + 1;
 		}
@@ -69,6 +105,39 @@ void big_sub (BigInt res, BigInt a, BigInt b)
 	}
 }
 
+/* res = a * b (com sinal) */
+void big_mul (BigInt res, BigInt a, BigInt b)
+{
+	big_umul(res,a,b);
+}
+
+/* res = a * b (sem sinal) */
+void big_umul (BigInt res, BigInt a, BigInt b)
+{
+	BigInt um, zero, aux_a, aux_b, aux_res;
+	big_uval(zero,0);
+	big_uval(res,0);
+	big_uval(um,1);
+
+	while(big_ucmp(b,zero))
+	{
+		if(b[0]&1)
+		{
+			big_sum(aux_res,res,a);
+			big_copy(res,aux_res);
+		}
+
+		big_shl(aux_a,a,1);
+		big_copy(a,aux_a);
+
+		big_shr(aux_b,b,1);
+		big_copy(b,aux_b);
+	}
+}
+
+/* Operacoes de deslocamento */
+
+/* res = a << n */
 void big_shl (BigInt res, BigInt a, int n)
 {
 	int byte;
@@ -79,7 +148,7 @@ void big_shl (BigInt res, BigInt a, int n)
 
 	resBytes += n / 8;
 
-	zerar_bytes(res);
+	reset_bytes(res);
 
 	qnt_bits = n % 8;
 
@@ -92,7 +161,7 @@ void big_shl (BigInt res, BigInt a, int n)
 	}
 }
 
-
+/* res = a >> n (logico) */
 void big_shr (BigInt res, BigInt a, int n)
 {
 	int byte;
@@ -104,7 +173,7 @@ void big_shr (BigInt res, BigInt a, int n)
 	resBytes += NUM_BYTES - n / 8 - 1;
 	aBytes += NUM_BYTES - 1;
 
-	zerar_bytes(res);
+	reset_bytes(res);
 
 	qnt_bits = n % 8;
 
@@ -117,57 +186,59 @@ void big_shr (BigInt res, BigInt a, int n)
 	}
 }
 
-void big_val (BigInt res, int val)
+/* Comparacao: retorna -1 (a < b), 0 (a == b), 1 (a > b) */
+
+/* comparacao com sinal */
+int big_cmp(BigInt a, BigInt b)
 {
-	int * n = (int *) res;
-	char bit_do_sinal;
-
-	bit_do_sinal = (val & 0x80000000) == 0x80000000;
-
-	if ( bit_do_sinal == 0x01 )
-	{
-		zerar_bytes_com(res, 0xff);
-	}
+	if(IsEqual(a,b))
+		return 0;
 	else
 	{
-		zerar_bytes_com(res, 0x00);
+		if(IsLessThanForSigned(a,b))
+			return -1;
+		else
+			return 1;
 	}
-	
-	*n = val;
 }
 
-void big_uval (BigInt res, unsigned int uval)
+/* comparacao sem sinal */
+int big_ucmp(BigInt a, BigInt b)
 {
-	unsigned int * n = (unsigned int *) res; 
-	zerar_bytes(res);
-	*n = uval;
+	if(IsEqual(a,b))
+		return 0;
+	else
+	{
+		if(IsLessThan(a,b))
+			return -1;
+		else
+			return 1;
+	}
 }
 
-unsigned int big_cast_uint(BigInt res)
+/*-------FIM da implementação das funções exportadas-------*/
+
+/*-------Implementação das funções encapsuladas-------*/
+
+void big_copy(BigInt res, BigInt a)
 {
-	return *((unsigned int *) res);
+	int i = 0;
+	for(i = 0; i < NUM_BYTES; i++)
+		res[i] = a[i];
 }
 
-int big_cast_int(BigInt res)
-{
-	return *((int *) res);
-}
-
-void zerar_bytes_com(BigInt res, char byte)
+void reset_bytes_with(BigInt res, char byte)
 {
 	int i;
 	char * bytes = (char *) res;
 
 	for ( i = 0 ; i < NUM_BYTES ; i++ )
-	{
 		*bytes++ = byte;
-	}
 }
 
-
-void zerar_bytes(BigInt res)
+void reset_bytes(BigInt res)
 {
-	zerar_bytes_com(res, 0);
+	reset_bytes_with(res, 0);
 }
 
 unsigned char bit_pow(unsigned char n, unsigned char exp)
@@ -175,18 +246,15 @@ unsigned char bit_pow(unsigned char n, unsigned char exp)
 	unsigned char i;
 	unsigned char res = 1;
 	for(i = 0; i < exp; i++)
-	{
 		res *= n;
-	}
+	
 	return res; 
 }
-
 
 unsigned char byte_shift_esquerda(unsigned char bits, unsigned char qnt_bits)
 {
 	 return bits * bit_pow(2, qnt_bits);
 }
-
 
 unsigned char byte_shift_direita(unsigned char bits, unsigned char qnt_bits)
 {
@@ -194,44 +262,33 @@ unsigned char byte_shift_direita(unsigned char bits, unsigned char qnt_bits)
 	return (pow_result == 0 ? 0 : bits / pow_result);
 }
 
-/* checa se o dois bigints sao iguais */
-int EhIgual(BigInt a, BigInt b)
+/* Checa se o dois BigInts sao iguais */
+int IsEqual(BigInt a, BigInt b)
 {
-	int ehIgual = 1;
 	int i = 0;
 	for(i = 0; i < NUM_BYTES; i++)
 	{
 		if(a[i] != b[i])
-		{
-			ehIgual = 0;
-			break;
-		}
+			return 0;
 	}
 
-	if(ehIgual)
-		return ehIgual;
-
-	return 0;
+	return 1;
 }
 
-/* checa se o big int é negativo */
-int EhNegativo(BigInt a)
+/* Checa se o BigInt é negativo */
+int IsNegative(BigInt a)
 {
 	char val = a[NUM_BYTES-1];
 	char bit_do_sinal = (val & 0x80000000) == 0x80000000;
 
 	if ( bit_do_sinal == 0x01 )
-	{
 		return 1;
-	}
 	else
-	{
 		return 0;
-	}
 }
 
-/* transforama numero negativo em positivo e vice-versa */
-void InvertePorComplementoA2(BigInt a, BigInt res)
+/* Transforama número negativo em positivo e vice-versa */
+void Reverse(BigInt a, BigInt res)
 {
 	BigInt um; // bigint contendo valor 1
 	BigInt aux_a; // bigint que auxilia na conversao de 'a'
@@ -247,37 +304,36 @@ void InvertePorComplementoA2(BigInt a, BigInt res)
 
 }
 
-int EhMenorForSigned(BigInt a, BigInt b)
+int IsLessThanForSigned(BigInt a, BigInt b)
 {
 	int i;
 	BigInt a_complementoA2;
 	BigInt b_complementoA2;
 
-
 	/* Se 'a' for negativo e 'b' não */
-	if(EhNegativo(a) && !(EhNegativo(b)))
+	if(IsNegative(a) && !(IsNegative(b)))
 	{
 		/* converte 'a' para positivo */
-		InvertePorComplementoA2(a, a_complementoA2);
+		Reverse(a, a_complementoA2);
 
-		return EhMenor(b,a_complementoA2);
+		return IsLessThan(b,a_complementoA2);
 	}
 	/* Se 'a' for negativo e 'b' não  */
-	else if(!EhNegativo(a) && (EhNegativo(b)))
+	else if(!IsNegative(a) && (IsNegative(b)))
 	{
 		/* converte 'b' para positivo */
-		InvertePorComplementoA2(b, b_complementoA2);
+		Reverse(b, b_complementoA2);
 
-		return EhMenor(b_complementoA2,a);
+		return IsLessThan(b_complementoA2,a);
 	}
 	/* Se ambos forem negativos */
-	else if(EhNegativo(a) && (EhNegativo(b)))
+	else if(IsNegative(a) && (IsNegative(b)))
 	{
 		/* converte ambos para positivo */
-		InvertePorComplementoA2(a, a_complementoA2);
-		InvertePorComplementoA2(b, b_complementoA2);
+		Reverse(a, a_complementoA2);
+		Reverse(b, b_complementoA2);
 		
-		return EhMenor(b_complementoA2,a_complementoA2);
+		return IsLessThan(b_complementoA2,a_complementoA2);
 	}
 
 	/* Se ambos fore positivos */
@@ -288,15 +344,18 @@ int EhMenorForSigned(BigInt a, BigInt b)
 		if((a[i] == 0xFF) && (b[i] == 0xFF) || a[i] == b[i])
 			continue;
 
-		// Caso o byte corrente de a for maior que o de b, então o Big int a é maior que o BigInt b
+		// Caso o byte corrente de 'a' for maior que o de 'b', então o Bigint 'a' é maior que o BigInt 'b'
 		if(a[i] > b[i])
 			return 0;
 
 		return 1;
 	}
+
+	// error
+	return -1;
 }
 
-int EhMenor(BigInt a, BigInt b)
+int IsLessThan(BigInt a, BigInt b)
 {
 	int i;
 
@@ -307,67 +366,15 @@ int EhMenor(BigInt a, BigInt b)
 		if((a[i] == 0x00) && (b[i] == 0x00) || a[i] == b[i])
 			continue;
 
-		// Caso o byte corrente de a for maior que o de b, então o Big int a é maior que o BigInt b
+		// Caso o byte corrente de 'a' for maior que o de 'b', então o Bigint 'a' é maior que o BigInt 'b'
 		if(a[i] > b[i])
 			return 0;
 
 		return 1;
 	}
+
+	// error
+	return -1;
 }
 
-/* Comparacao: retorna -1 (a < b), 0 (a == b), 1 (a > b) */
-int big_ucmp(BigInt a, BigInt b)
-{
-	if(EhIgual(a,b))
-		return 0;
-	else
-	{
-		if(EhMenor(a,b))
-			return -1;
-		else
-			return 1;
-	}
-}
-/* Comparacao: retorna -1 (a < b), 0 (a == b), 1 (a > b) */
-int big_cmp(BigInt a, BigInt b)
-{
-	if(EhIgual(a,b))
-		return 0;
-	else
-	{
-		if(EhMenorForSigned(a,b))
-			return -1;
-		else
-			return 1;
-	}
-}
-
-void big_umul (BigInt res, BigInt a, BigInt b)
-{
-
-	BigInt um, zero, aux_a, aux_b, aux_res;
-	big_uval(zero,0);
-	big_uval(res,0);
-	big_uval(um,1);
-	while(big_ucmp(b,zero))
-	{
-		if(b[0]&1)
-		{
-			big_sum(aux_res,res,a);
-			bigint_copy(res,aux_res);
-		}
-
-		big_shl(aux_a,a,1);
-		bigint_copy(a,aux_a);
-
-		big_shr(aux_b,b,1);
-		bigint_copy(b,aux_b);
-	}
-}
-
-void big_mul (BigInt res, BigInt a, BigInt b)
-{
-	big_umul(res,a,b);
-}
-
-
+/*------- FIM Implementação das funções encapsuladas-------*/
