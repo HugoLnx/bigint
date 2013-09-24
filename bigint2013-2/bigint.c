@@ -327,7 +327,7 @@ int IsLessThanForSigned(BigInt a, BigInt b)
 		return IsLessThan(b_complementoA2,a);
 	}
 	/* Se ambos forem negativos */
-	else if(IsNegative(a) && (IsNegative(b)))
+	else if((IsNegative(a)) && (IsNegative(b)))
 	{
 		/* converte ambos para positivo */
 		Reverse(a, a_complementoA2);
@@ -341,7 +341,7 @@ int IsLessThanForSigned(BigInt a, BigInt b)
 	for(i = NUM_BYTES-1; i >= 0; i--)
 	{
 		// Se ambos forem 0xFF ou se forem iguais, continua a iteração
-		if((a[i] == 0xFF) && (b[i] == 0xFF) || a[i] == b[i])
+		if( (a[i] == 0xFF && b[i] == 0xFF) || a[i] == b[i] )		
 			continue;
 
 		// Caso o byte corrente de 'a' for maior que o de 'b', então o Bigint 'a' é maior que o BigInt 'b'
@@ -363,7 +363,7 @@ int IsLessThan(BigInt a, BigInt b)
 	for(i = NUM_BYTES-1; i >= 0; i--)
 	{
 		// Se ambos forem 0x00 ou se forem iguais, continua a iteração
-		if((a[i] == 0x00) && (b[i] == 0x00) || a[i] == b[i])
+		if( (a[i] == 0x00 && b[i] == 0x00) || a[i] == b[i] )
 			continue;
 
 		// Caso o byte corrente de 'a' for maior que o de 'b', então o Bigint 'a' é maior que o BigInt 'b'
