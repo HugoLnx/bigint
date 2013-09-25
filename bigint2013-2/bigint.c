@@ -287,7 +287,7 @@ int is_negative(BigInt a)
 		return 0;
 }
 
-/* Transforama número negativo em positivo e vice-versa */
+/* Transforma número negativo em positivo e vice-versa */
 void reverse(BigInt a, BigInt res)
 {
 	BigInt um; // bigint contendo valor 1
